@@ -1,0 +1,17 @@
+../Core/Src/main.c:123:13:avg_reset	2
+../Core/Src/main.c:129:14:avg_push	3
+../Core/Src/main.c:139:12:is_saturated	3
+../Core/Src/main.c:146:5:_write	1
+../Core/Src/main.c:159:5:main	26
+../Core/Src/main.c:420:6:SystemClock_Config	3
+../Core/Src/main.c:468:13:MX_I2C1_Init	2
+../Core/Src/main.c:502:13:MX_TIM2_Init	6
+../Core/Src/main.c:561:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:594:13:MX_GPIO_Init	1
+../Core/Src/main.c:664:6:generate_uuid	1
+../Core/Src/main.c:682:6:SendLaserDataToServer	3
+../Core/Src/main.c:702:6:SendLoadcellDataToServer	1
+../Core/Src/main.c:712:6:HAL_GPIO_EXTI_Callback	3
+../Core/Src/main.c:729:5:__io_putchar	1
+../Core/Src/main.c:734:5:__io_getchar	1
+../Core/Src/main.c:745:6:Error_Handler	1

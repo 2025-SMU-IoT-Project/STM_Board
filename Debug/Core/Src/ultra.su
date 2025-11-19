@@ -1,0 +1,7 @@
+../Core/Src/ultra.c:17:6:Ultra_Init	8	static
+../Core/Src/ultra.c:23:13:US_Trigger10us	8	static
+../Core/Src/ultra.c:33:12:US_MeasureEcho_us	32	static
+../Core/Src/ultra.c:54:7:Ultra_GetDistance_CM	16	static
+../Core/Src/ultra.c:68:7:Ultra_CalibrateHeight	24	static
+../Core/Src/ultra.c:82:13:DWT_DelayInit	4	static
+../Core/Src/ultra.c:89:13:DWT_Delay_us	24	static,ignoring_inline_asm
