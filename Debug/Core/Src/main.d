@@ -26,12 +26,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/cup_system.h ../Core/Inc/hx711.h ../Core/Inc/ultra.h \
- ../Core/Inc/main.h ../Core/Inc/vl53l0x_wrapper.h \
- ../Drivers/VL53L0X/core/inc/vl53l0x_api.h \
+ ../Core/Inc/main.h ../Drivers/VL53L0X/core/inc/vl53l0x_api.h \
  ../Drivers/VL53L0X/core/inc/vl53l0x_api_strings.h \
  ../Drivers/VL53L0X/core/inc/vl53l0x_def.h \
  ../Drivers/VL53L0X/core/inc/vl53l0x_device.h \
@@ -40,7 +40,11 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/VL53L0X/core/inc/vl53l0x_def.h \
  ../Drivers/VL53L0X/platform/inc/vl53l0x_platform_log.h \
  ../Drivers/VL53L0X/platform/inc/vl53l0x_i2c_platform.h \
- ../Core/Inc/vl53l0x_platform.h
+ ../Core/Inc/vl53l0x_wrapper.h ../Core/Inc/vl53l0x_platform.h \
+ ../Core/Inc/sx1272/radio.h ../Core/Inc/sx1272/sx1272-board.h \
+ ../Core/Inc/sx1272/sx1272.h ../Core/Inc/sx1272/radio.h \
+ ../Core/Inc/sx1272/sx1272Regs-Fsk.h ../Core/Inc/sx1272/sx1272Regs-LoRa.h \
+ ../Core/Inc/sx1272/timer.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -69,6 +73,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
@@ -76,7 +81,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/hx711.h:
 ../Core/Inc/ultra.h:
 ../Core/Inc/main.h:
-../Core/Inc/vl53l0x_wrapper.h:
 ../Drivers/VL53L0X/core/inc/vl53l0x_api.h:
 ../Drivers/VL53L0X/core/inc/vl53l0x_api_strings.h:
 ../Drivers/VL53L0X/core/inc/vl53l0x_def.h:
@@ -86,4 +90,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/VL53L0X/core/inc/vl53l0x_def.h:
 ../Drivers/VL53L0X/platform/inc/vl53l0x_platform_log.h:
 ../Drivers/VL53L0X/platform/inc/vl53l0x_i2c_platform.h:
+../Core/Inc/vl53l0x_wrapper.h:
 ../Core/Inc/vl53l0x_platform.h:
+../Core/Inc/sx1272/radio.h:
+../Core/Inc/sx1272/sx1272-board.h:
+../Core/Inc/sx1272/sx1272.h:
+../Core/Inc/sx1272/radio.h:
+../Core/Inc/sx1272/sx1272Regs-Fsk.h:
+../Core/Inc/sx1272/sx1272Regs-LoRa.h:
+../Core/Inc/sx1272/timer.h:

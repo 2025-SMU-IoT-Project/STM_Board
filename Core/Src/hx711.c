@@ -50,19 +50,19 @@ int32_t HX711_ReadRaw(HX711_t *hx)
     __disable_irq();
 
     for (int i = 0; i < 24; i++) {
-        // SCK HIGH
-        HAL_GPIO_WritePin(hx->sck_port, hx->sck_pin, GPIO_PIN_SET);
-        HX711_DWT_Delay_us(1);
-
         data <<= 1;
 
-        // SCK LOW
-        HAL_GPIO_WritePin(hx->sck_port, hx->sck_pin, GPIO_PIN_RESET);
-        HX711_DWT_Delay_us(1);
+        // SCK HIGH
+        HAL_GPIO_WritePin(hx->sck_port, hx->sck_pin, GPIO_PIN_SET);
+        HX711_DWT_Delay_us(10);
 
         if (HAL_GPIO_ReadPin(hx->dout_port, hx->dout_pin) == GPIO_PIN_SET) {
             data |= 1;
         }
+
+        // SCK LOW
+        HAL_GPIO_WritePin(hx->sck_port, hx->sck_pin, GPIO_PIN_RESET);
+        HX711_DWT_Delay_us(10);
     }
 
     // GAIN 추가 클
@@ -167,11 +167,8 @@ int32_t HX711_Tare_Robust(HX711_t *hx, int n)
             buf[j]=t;
         }
 
-    int s = n/10, e = n - s;
-    long long sum = 0; int cnt=0;
-    for (int i=s;i<e;i++) { sum += buf[i]; cnt++; }
-
-    hx->offset = (int32_t)(sum / cnt);
+    // 중간값(Median) 사용
+    hx->offset = buf[n/2];
     return hx->offset;
 }
 

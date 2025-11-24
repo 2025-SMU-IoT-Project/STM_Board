@@ -36,7 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern SPI_HandleTypeDef hspi1;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -61,20 +61,31 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define B1_EXTI_IRQn EXTI15_10_IRQn
+#define RADIO_ANT_SWITCH_Pin GPIO_PIN_0
+#define RADIO_ANT_SWITCH_GPIO_Port GPIOC
+#define RADIO_RESET_Pin GPIO_PIN_1
+#define RADIO_RESET_GPIO_Port GPIOC
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_5
-#define LD2_GPIO_Port GPIOA
+#define TRIG_Pin GPIO_PIN_8
+#define TRIG_GPIO_Port GPIOA
 #define ECHO_Pin GPIO_PIN_9
 #define ECHO_GPIO_Port GPIOA
-#define TRIG_Pin GPIO_PIN_10
-#define TRIG_GPIO_Port GPIOA
+#define RADIO_DIO_0_Pin GPIO_PIN_10
+#define RADIO_DIO_0_GPIO_Port GPIOA
+#define RADIO_DIO_0_EXTI_IRQn EXTI15_10_IRQn
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define RADIO_DIO_1_Pin GPIO_PIN_3
+#define RADIO_DIO_1_GPIO_Port GPIOB
+#define RADIO_DIO_1_EXTI_IRQn EXTI3_IRQn
+#define RADIO_NSS_Pin GPIO_PIN_6
+#define RADIO_NSS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

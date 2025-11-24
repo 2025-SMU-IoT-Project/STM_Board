@@ -1,2 +1,2 @@
-../Core/Src/cup_system.c:21:6:CupSystem_Init	8	static
-../Core/Src/cup_system.c:27:6:CupSystem_Update	16	static
+../Core/Src/cup_system.c:24:6:CupSystem_Init	8	static
+../Core/Src/cup_system.c:30:6:CupSystem_Update	16	static

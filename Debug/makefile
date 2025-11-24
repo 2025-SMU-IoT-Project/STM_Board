@@ -13,6 +13,7 @@ RM := rm -rf
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
+-include Core/Inc/sx1272/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -61,8 +62,8 @@ all: main-build
 main-build: SmartBin.elf secondary-outputs
 
 # Tool invocations
-SmartBin.elf SmartBin.map: $(OBJS) $(USER_OBJS) /Users/sj_lee/Desktop/IoT_STM_Project/SmartBin/STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "SmartBin.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/sj_lee/Desktop/IoT_STM_Project/SmartBin/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SmartBin.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SmartBin.elf SmartBin.map: $(OBJS) $(USER_OBJS) C:\Users\kjp10\Desktop\major\3-2\IoT\SmartBin\SmartBin\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "SmartBin.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\kjp10\Desktop\major\3-2\IoT\SmartBin\SmartBin\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SmartBin.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

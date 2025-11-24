@@ -6,4 +6,4 @@
 ../Core/Src/hx711.c:128:13:HX711_DWT_Delay_Init	1
 ../Core/Src/hx711.c:135:13:HX711_DWT_Delay_us	2
 ../Core/Src/hx711.c:144:16:read_valid	3
-../Core/Src/hx711.c:151:9:HX711_Tare_Robust	8
+../Core/Src/hx711.c:151:9:HX711_Tare_Robust	7
