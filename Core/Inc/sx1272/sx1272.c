@@ -30,8 +30,6 @@
 #include "sx1272.h"
 #include "sx1272-board.h"
 
-extern SPI_HandleTypeDef hspi1;
-
 /*
  * Local types definition
  */
@@ -225,9 +223,9 @@ void SX1272Init( RadioEvents_t *events )
     RadioEvents = events;
 
     // Initialize driver timeout timers
-    TimerInit( &TxTimeoutTimer, (void (*)(void))SX1272OnTimeoutIrq );
-    TimerInit( &RxTimeoutTimer, (void (*)(void))SX1272OnTimeoutIrq );
-    TimerInit( &RxTimeoutSyncWord, (void (*)(void))SX1272OnTimeoutIrq );
+    TimerInit( &TxTimeoutTimer, SX1272OnTimeoutIrq );
+    TimerInit( &RxTimeoutTimer, SX1272OnTimeoutIrq );
+    TimerInit( &RxTimeoutSyncWord, SX1272OnTimeoutIrq );
 
     SX1272Reset( );
 
@@ -1312,7 +1310,6 @@ void SX1272OnDio1Irq( void* context )
     }
 }
 
-/*
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     switch(GPIO_Pin)
@@ -1335,4 +1332,3 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
             break;
     }
 }
-*/

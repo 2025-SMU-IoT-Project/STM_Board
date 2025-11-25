@@ -58,7 +58,7 @@ typedef struct {
     float stable_weight;           // 안정화된 무게
     float prev_weight;             // 이전 무게
     int stable_cnt;                // 안정 카운트
-    char current_event_uuid[37];   // 현재 이벤트 UUID
+    char current_event_id[16];     // 현재 이벤트 ID
     uint32_t last_live_send_time;  // 마지막 LIVE 전송 시간
     const char* bin_type;          // "CUP" 또는 "WATER"
     volatile uint8_t isIRTriggered; // IR 센서 플래그
@@ -105,12 +105,13 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 #define BIN_ID 1
-static uint32_t uuid_counter = 0;
-char current_event_uuid[37] = {0};
+static uint32_t event_id_counter = 0;
+char current_event_id[16] = {0};
 
 /* ---- LoRa 관련 ---- */
 static RadioEvents_t RadioEvents;     // 콜백 구조체
 static uint8_t LoRaTxBuffer[256];    // 보낼 버퍼(최대 255 byte 정도)
+static volatile uint8_t LoRaTxDone = 0;  // 전송 완료 플래그
 
 VL53L0X_Dev_t vl53l0x_device;
 VL53L0X_RangingMeasurementData_t RangingData;
@@ -249,8 +250,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   LoRa_Init();   // LoRa 드라이버 초기화
   CupSystem_Init();
-  uuid_counter = 0;
-  memset(current_event_uuid, 0, sizeof(current_event_uuid));
+  event_id_counter = 0;
+  memset(current_event_id, 0, sizeof(current_event_id));
 
   // laser
   HAL_Delay(1000);
@@ -363,9 +364,9 @@ int main(void)
 			          uint32_t f10 = (uint32_t)(fill * 10.0f + 0.5f);
 
 			          // 빔 쏘기는 둘 중 JSON 만들고 UART+LoRa 둘 다 전송
-			          if (isIRTriggered && current_event_uuid[0] != '\0') {
-			              // 이벤트 중 (uuid 포함)
-			              SendUltraOverLoRa(d10, f10, current_event_uuid);
+			          if (isIRTriggered && current_event_id[0] != '\0') {
+			              // 이벤트 중 (id 포함)
+			              SendUltraOverLoRa(d10, f10, current_event_id);
 			          } else {
 			              // 평상시 LIVE
 			              SendUltraOverLoRa(d10, f10, NULL);
@@ -376,11 +377,11 @@ int main(void)
 			  }
 
           // 3. 로드셀(HX711): 물/컵 무게 측정 (IR 이벤트가 있을 때에만 동작)
-          strncpy(cup_loadcell.current_event_uuid, current_event_uuid, sizeof(cup_loadcell.current_event_uuid) - 1);
-          cup_loadcell.current_event_uuid[sizeof(cup_loadcell.current_event_uuid) - 1] = '\0'; // Ensure null-termination
+          strncpy(cup_loadcell.current_event_id, current_event_id, sizeof(cup_loadcell.current_event_id) - 1);
+          cup_loadcell.current_event_id[sizeof(cup_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
 
-          strncpy(water_loadcell.current_event_uuid, current_event_uuid, sizeof(water_loadcell.current_event_uuid) - 1);
-          water_loadcell.current_event_uuid[sizeof(water_loadcell.current_event_uuid) - 1] = '\0'; // Ensure null-termination
+          strncpy(water_loadcell.current_event_id, current_event_id, sizeof(water_loadcell.current_event_id) - 1);
+          water_loadcell.current_event_id[sizeof(water_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
 
           LoadCell_Process(&cup_loadcell);
           LoadCell_Process(&water_loadcell);
@@ -400,8 +401,8 @@ int main(void)
           isIRTriggered = 0;
       }
 
-      memset(cup_loadcell.current_event_uuid, 0, sizeof(cup_loadcell.current_event_uuid));
-      memset(water_loadcell.current_event_uuid, 0, sizeof(water_loadcell.current_event_uuid));
+      memset(cup_loadcell.current_event_id, 0, sizeof(cup_loadcell.current_event_id));
+      memset(water_loadcell.current_event_id, 0, sizeof(water_loadcell.current_event_id));
       LoadCell_Process(&cup_loadcell);
       LoadCell_Process(&water_loadcell);
 
@@ -764,8 +765,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PC9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  /*Configure GPIO pins : PC6 PC9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -856,9 +857,27 @@ void LoRa_Send(const char *msg)
     uint16_t size = (uint16_t)strlen(msg);
     if (size > sizeof(LoRaTxBuffer))
         size = sizeof(LoRaTxBuffer);
+    
+    printf("[LoRa Send] (%d bytes) %s\r\n", size, msg); // 크기 포함
 
     memcpy(LoRaTxBuffer, msg, size);
+    
+    // 전송 시작
+    LoRaTxDone = 0;
     Radio.Send(LoRaTxBuffer, size);
+    
+    // 전송 완료 대기 (최대 5초)
+    uint32_t start_time = HAL_GetTick();
+    while (!LoRaTxDone && (HAL_GetTick() - start_time < 5000)) {
+        HAL_Delay(10);
+    }
+    
+    if (!LoRaTxDone) {
+        printf("[LoRa] TX TIMEOUT! (%d bytes)\r\n", size);
+    }
+    
+    // Rx가 수신 모드로 전환할 시간 확보
+    HAL_Delay(150);
 }
 
 /* ---- 콜백 함수들 ---- */
@@ -866,6 +885,7 @@ static void OnTxDone(void)
 {
     // 송신 끝나면 슬립 + 디버그 출력 정도만
     Radio.Sleep();
+    LoRaTxDone = 1;  // 전송 완료 플래그 설정
     printf("[LoRa] TxDone\r\n");
 }
 
@@ -874,38 +894,43 @@ static void OnTxTimeout(void)
     Radio.Sleep();
     printf("[LoRa] TxTimeout\r\n");
 }
-void generate_uuid(char *uuid_str)
+void generate_event_id(char *id_str)
 {
-  uint32_t timestamp = HAL_GetTick(); // 시스템 가동 시간 (ms)
-  uint32_t counter = uuid_counter++;
+  // 4자리 Base36 ID 생성 (0000 ~ ZZZZ)
+  // 표현 가능 개수: 36^4 = 1,679,616
+  uint32_t id = ++event_id_counter; // 1부터 시작
+  if (event_id_counter >= 1679616) {
+      event_id_counter = 0;  // 다음 호출 시 1이 되도록 0으로 리셋
+  }
 
-  uint32_t rand1 = (timestamp * 1103515245 + 12345) & 0x7FFFFFFF;
-  uint32_t rand2 = (counter * 1664525 + 1013904223) & 0x7FFFFFFF;
-
-  // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  snprintf(uuid_str, 37, "%08lx-%04x-%04lx-%04lx-%08lx%04x",
-           timestamp,                    // 8자리: 타임스탬프
-           (uint16_t)(counter & 0xFFFF), // 4자리: 카운터
-           (rand1 >> 16) & 0xFFFF,       // 4자리: 랜덤1
-           rand2 & 0xFFFF,               // 4자리: 랜덤2
-           rand1,                        // 8자리: 랜덤1 전체
-           (uint16_t)(rand2 >> 16));      // 4자리: 랜덤2
+  const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  
+  // 뒤에서부터 채우기
+  id_str[3] = charset[id % 36];
+  id /= 36;
+  id_str[2] = charset[id % 36];
+  id /= 36;
+  id_str[1] = charset[id % 36];
+  id /= 36;
+  id_str[0] = charset[id % 36];
+  
+  id_str[4] = '\0';
 }
 
 void SendLaserDataToServer(void)
 {
-  // Chunk size for splitting data (20 samples * ~4-5 chars + overhead < 256 bytes)
-  #define CHUNK_SIZE 20
-  
+  // Chunk size 축소: 10 samples * ~4 chars + overhead < 80 bytes
+  #define CHUNK_SIZE 10
+
   for (int start_idx = 0; start_idx < SAMPLES_PER_EVENT; start_idx += CHUNK_SIZE)
   {
     int offset = 0;
     
     // Start JSON object
-    // Format: {"uuid":"...","idx":0,"data":[...]}
+    // Format: {"id":"1234","idx":0,"data":[...]}
     offset += snprintf(laser_buffer + offset, sizeof(laser_buffer) - offset,
-                       "{\"uuid\":\"%s\",\"idx\":%d,\"data\":[",
-                       current_event_uuid, start_idx);
+                       "{\"id\":\"%s\",\"idx\":%d,\"data\":[",
+                       current_event_id, start_idx);
 
     // Append data points
     for (int i = 0; i < CHUNK_SIZE; i++)
@@ -928,32 +953,32 @@ void SendLaserDataToServer(void)
 
     // Send chunk over LoRa
     LoRa_Send(laser_buffer);
-
-    // Delay to prevent LoRa congestion
-    HAL_Delay(200);
+    
+    // 추가 대기 시간 (LoRa_Send의 150ms + 50ms = 200ms 간격)
+    HAL_Delay(50);
   }
 }
 
-void SendDataToServer(float weight, const char *uuid_type, const char *bin_type)
+void SendDataToServer(float weight, const char *id_type, const char *bin_type)
 {
     int len = snprintf(json_buffer, sizeof(json_buffer),
-                       "{\"weight\":%.2f,\"uuid\":\"%s\",\"type\":\"%s\"}\r\n",
-                       weight, uuid_type, bin_type);
+                       "{\"weight\":%.2f,\"id\":\"%s\",\"type\":\"%s\"}\r\n",
+                       weight, id_type, bin_type);
 
     // 센서 데이터 페이로드는 LoRa로만 전송
     LoRa_Send(json_buffer);
 }
 
-void SendUltraOverLoRa(uint32_t d10, uint32_t f10, const char *uuid_opt)
+void SendUltraOverLoRa(uint32_t d10, uint32_t f10, const char *id_opt)
 {
     char buf[128];
 
-    if (uuid_opt && uuid_opt[0] != '\0')
+    if (id_opt && id_opt[0] != '\0')
     {
         int len = snprintf(buf, sizeof(buf),
-                           "{\"binId\":%d,\"uuid\":\"%s\","
+                           "{\"binId\":%d,\"id\":\"%s\","
                            "\"distanceCm\":%lu.%lu,\"fillRate\":%lu.%lu}\r\n",
-                           BIN_ID, uuid_opt,
+                           BIN_ID, id_opt,
                            d10 / 10U, d10 % 10U,
                            f10 / 10U, f10 % 10U);
 
@@ -974,28 +999,28 @@ void SendUltraOverLoRa(uint32_t d10, uint32_t f10, const char *uuid_opt)
     }
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    // 1) LoRa DIO 핀 등 sx1272 드라이버로 인터럽트 전달
-    if (GPIO_Pin == RADIO_DIO_0_Pin || GPIO_Pin == RADIO_DIO_1_Pin)
-    {
-        Radio.IrqProcess();   // Lecture7 TX/RX 예제에서도 썼던 함수
-    }
-
-    // 2) B1 버튼 처리 (IR 트리거)
-    if (GPIO_Pin == B1_Pin)
-    {
-        printf("B1 pin\r\n");
-        static uint32_t last_press_time = 0;
-        uint32_t current_time = HAL_GetTick();
-
-        if (current_time - last_press_time > 300)
-        {
-            isIRTriggered = 1; // 측정 시작 플래그 설정
-            last_press_time = current_time;
-        }
-    }
-}
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//    // 1) LoRa DIO 핀 등 sx1272 드라이버로 인터럽트 전달
+//    if (GPIO_Pin == RADIO_DIO_0_Pin || GPIO_Pin == RADIO_DIO_1_Pin)
+//    {
+//        Radio.IrqProcess();   // Lecture7 TX/RX 예제에서도 썼던 함수
+//    }
+//
+//    // 2) B1 버튼 처리 (IR 트리거)
+//    if (GPIO_Pin == B1_Pin)
+//    {
+//        printf("B1 pin\r\n");
+//        static uint32_t last_press_time = 0;
+//        uint32_t current_time = HAL_GetTick();
+//
+//        if (current_time - last_press_time > 300)
+//        {
+//            isIRTriggered = 1; // 측정 시작 플래그 설정
+//            last_press_time = current_time;
+//        }
+//    }
+//}
 
 /**
  * @brief 로드셀 초기화
@@ -1023,7 +1048,7 @@ void LoadCell_Init(LoadCellContext_t *ctx,
     ctx->bin_type = bin_type;
     ctx->isIRTriggered = 0;
     ctx->last_live_send_time = HAL_GetTick();
-    memset(ctx->current_event_uuid, 0, sizeof(ctx->current_event_uuid));
+    memset(ctx->current_event_id, 0, sizeof(ctx->current_event_id));
 }
 
 /**
@@ -1096,8 +1121,8 @@ void LoadCell_Process(LoadCellContext_t *ctx)
         ctx->stable_weight = w_filt;
 
         // 음수 무시
-        if (ctx->stable_weight > 0.0f && ctx->current_event_uuid[0] != '\0') {
-            SendDataToServer(ctx->stable_weight, ctx->current_event_uuid, ctx->bin_type);
+        if (ctx->stable_weight > 0.0f && ctx->current_event_id[0] != '\0') {
+            SendDataToServer(ctx->stable_weight, ctx->current_event_id, ctx->bin_type);
         }
     }
 
@@ -1105,8 +1130,8 @@ void LoadCell_Process(LoadCellContext_t *ctx)
     if (ctx->is_stable && fabsf(w_filt - ctx->stable_weight) > STABLE_THRESHOLD) {
         ctx->is_stable = 0;
 
-        if (w_filt > 0.0f && ctx->current_event_uuid[0] != '\0') {
-            SendDataToServer(w_filt, ctx->current_event_uuid, ctx->bin_type);
+        if (w_filt > 0.0f && ctx->current_event_id[0] != '\0') {
+            SendDataToServer(w_filt, ctx->current_event_id, ctx->bin_type);
         }
     }
 
