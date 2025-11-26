@@ -283,7 +283,7 @@ int main(void)
       float bin_height = Ultra_CalibrateHeight();
       if (bin_height <= 0.0f) {
           // 실패하면 기본값 75cm 사용
-          bin_height = 75.0f;
+          bin_height = 40.0f;
           printf("Calibrate failed, use default 75.0 cm\r\n");
       }
       else {
@@ -302,7 +302,7 @@ int main(void)
     LoadCell_Init(&water_loadcell,
                   GPIOA, GPIO_PIN_4,    // DOUT
                   GPIOB, GPIO_PIN_10,   // SCK
-                  452.0f,               // scale (조정된 값)
+                  -14.19f,               // scale (조정된 값)
                   "WATER");
 
     printf("=== Dual Load Cell System Started ===\r\n");
@@ -348,7 +348,17 @@ int main(void)
 			  // 측정 완료 후 서버로 데이터 전송
 			  SendLaserDataToServer();
 
-			  // 2. 초음파 센서: 채워진 정도 측정 (이벤트 기준)
+			  // 2. 서보 모터 동작
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 5);
+			   HAL_Delay(1000);
+
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 15);
+			  HAL_Delay(1000);
+
+			  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 25);
+			   HAL_Delay(1000);
+
+			  // 3. 초음파 센서: 채워진 정도 측정 (이벤트 기준)
 			  uint32_t now_ultra = HAL_GetTick();  // 현재 시간 읽기
 			  if (now_ultra - last_ultra_send_time >= LIVE_SEND_INTERVAL_MS) {   // 5초 경과
 			      last_ultra_send_time = now_ultra;
@@ -376,43 +386,53 @@ int main(void)
 			      }
 			  }
 
-          // 3. 로드셀(HX711): 물/컵 무게 측정 (IR 이벤트가 있을 때에만 동작)
+          // 4. 로드셀(HX711): 물/컵 무게 측정 (IR 이벤트가 있을 때에만 동작)
           strncpy(cup_loadcell.current_event_id, current_event_id, sizeof(cup_loadcell.current_event_id) - 1);
-          cup_loadcell.current_event_id[sizeof(cup_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
+//          cup_loadcell.current_event_id[sizeof(cup_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
 
           strncpy(water_loadcell.current_event_id, current_event_id, sizeof(water_loadcell.current_event_id) - 1);
-          water_loadcell.current_event_id[sizeof(water_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
+//          water_loadcell.current_event_id[sizeof(water_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
 
           // [FIX] 안정적인 무게 측정을 위해 일정 시간 동안 반복 호출 (3초)
-          uint32_t lc_start = HAL_GetTick();
-          while (HAL_GetTick() - lc_start < 3000)
-          {
+//          HAL_Delay(1000);
+//          uint32_t lc_start = HAL_GetTick();
+//          while (HAL_GetTick() - lc_start < 3000)
+//          {
               LoadCell_Process(&cup_loadcell);
               LoadCell_Process(&water_loadcell);
-              HAL_Delay(10);
-          }
-
-          // 4. 서보 모터 동작
-          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 5);
-          HAL_Delay(1000);
-
-          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 15);
-          HAL_Delay(1000);
-
-          __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 25);
-          HAL_Delay(1000);
-
+//              HAL_Delay(10);
+//          }
 
           // IR 이벤트 처리 완료: 플래그 리셋
           isIRTriggered = 0;
       }
 
-      memset(cup_loadcell.current_event_id, 0, sizeof(cup_loadcell.current_event_id));
-      memset(water_loadcell.current_event_id, 0, sizeof(water_loadcell.current_event_id));
-      LoadCell_Process(&cup_loadcell);
-      LoadCell_Process(&water_loadcell);
+      // memset(cup_loadcell.current_event_id, "LIVE", sizeof(cup_loadcell.current_event_id));
+      // memset(water_loadcell.current_event_id, "LIVE", sizeof(water_loadcell.current_event_id));
+      // strncpy(cup_loadcell.current_event_id, "LIVE", sizeof(cup_loadcell.current_event_id));
+      // strncpy(water_loadcell.current_event_id, "LIVE", sizeof(water_loadcell.current_event_id));
 
-      HAL_Delay(50);
+      // LoadCell_Process(&cup_loadcell);
+      // LoadCell_Process(&water_loadcell);
+
+      // HAL_Delay(50);
+
+      static uint32_t last_lc_send_time = 0; 
+
+      // 현재 시간 확인
+      uint32_t now_lc = HAL_GetTick();
+
+      // 5초(5000ms)가 지났는지 확인
+      if (now_lc - last_lc_send_time >= 5000)
+      {
+          last_lc_send_time = now_lc; // 마지막 실행 시간 갱신
+
+          strncpy(cup_loadcell.current_event_id, "LIVE", sizeof(cup_loadcell.current_event_id));
+          strncpy(water_loadcell.current_event_id, "LIVE", sizeof(water_loadcell.current_event_id));
+
+          LoadCell_Process(&cup_loadcell);
+          LoadCell_Process(&water_loadcell);
+      }
 
       uint32_t now_ultra = HAL_GetTick();  // 현재 시간 읽기
         if (now_ultra - last_ultra_send_time >= LIVE_SEND_INTERVAL_MS) {   // 5초 경과
@@ -1103,6 +1123,7 @@ void LoadCell_Process(LoadCellContext_t *ctx)
 
     // 포화 체크
     if (LoadCell_IsSaturated(raw)) {
+        // printf("[%s] LoadCell Saturated! raw=%ld\r\n", ctx->bin_type, raw);
         return;  // 포화 시 무시
     }
 
@@ -1120,26 +1141,29 @@ void LoadCell_Process(LoadCellContext_t *ctx)
         ctx->stable_cnt = 0;
     }
     ctx->prev_weight = w_filt;
+ctx->stable_weight = w_filt;
+
+    SendDataToServer(ctx->stable_weight, ctx->current_event_id, ctx->bin_type);
 
     // ======= STABLE ON =======
-    if (!ctx->is_stable && ctx->stable_cnt >= STABLE_COUNT) {
-        ctx->is_stable = 1;
-        ctx->stable_weight = w_filt;
+  //   if (!ctx->is_stable && ctx->stable_cnt >= STABLE_COUNT) {
+  //       ctx->is_stable = 1;
+  //       ctx->stable_weight = w_filt;
 
-        // 음수 무시
-        if (ctx->stable_weight > 0.0f && ctx->current_event_id[0] != '\0') {
-            SendDataToServer(ctx->stable_weight, ctx->current_event_id, ctx->bin_type);
-        }
-    }
+  //       // 음수 무시
+  //       if (ctx->stable_weight > 0.0f && ctx->current_event_id[0] != '\0') {
+  //           SendDataToServer(ctx->stable_weight, ctx->current_event_id, ctx->bin_type);
+  //       }
+  //   }
 
-    // ======= STABLE OFF =======
-    if (ctx->is_stable && fabsf(w_filt - ctx->stable_weight) > STABLE_THRESHOLD) {
-        ctx->is_stable = 0;
+  //   // ======= STABLE OFF =======
+  //   if (ctx->is_stable && fabsf(w_filt - ctx->stable_weight) > STABLE_THRESHOLD) {
+  //       ctx->is_stable = 0;
 
-        if (w_filt > 0.0f && ctx->current_event_id[0] != '\0') {
-            SendDataToServer(w_filt, ctx->current_event_id, ctx->bin_type);
-        }
-    }
+  //       if (w_filt > 0.0f && ctx->current_event_id[0] != '\0') {
+  //           SendDataToServer(w_filt, ctx->current_event_id, ctx->bin_type);
+  //       }
+  //  }
 
     // ======= LIVE 주기적 전송 =======
     uint32_t current_time = HAL_GetTick();
