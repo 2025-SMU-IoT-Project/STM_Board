@@ -383,8 +383,14 @@ int main(void)
           strncpy(water_loadcell.current_event_id, current_event_id, sizeof(water_loadcell.current_event_id) - 1);
           water_loadcell.current_event_id[sizeof(water_loadcell.current_event_id) - 1] = '\0'; // Ensure null-termination
 
-          LoadCell_Process(&cup_loadcell);
-          LoadCell_Process(&water_loadcell);
+          // [FIX] 안정적인 무게 측정을 위해 일정 시간 동안 반복 호출 (3초)
+          uint32_t lc_start = HAL_GetTick();
+          while (HAL_GetTick() - lc_start < 3000)
+          {
+              LoadCell_Process(&cup_loadcell);
+              LoadCell_Process(&water_loadcell);
+              HAL_Delay(10);
+          }
 
           // 4. 서보 모터 동작
           __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 5);
