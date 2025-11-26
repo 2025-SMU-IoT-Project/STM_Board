@@ -919,8 +919,8 @@ void generate_event_id(char *id_str)
 
 void SendLaserDataToServer(void)
 {
-  // Chunk size 축소: 10 samples * ~4 chars + overhead < 80 bytes
-  #define CHUNK_SIZE 10
+  // Chunk size 축소: 5 samples -> 약 50 bytes 패킷
+  #define CHUNK_SIZE 5
 
   for (int start_idx = 0; start_idx < SAMPLES_PER_EVENT; start_idx += CHUNK_SIZE)
   {
@@ -954,8 +954,8 @@ void SendLaserDataToServer(void)
     // Send chunk over LoRa
     LoRa_Send(laser_buffer);
     
-    // 추가 대기 시간 (LoRa_Send의 150ms + 50ms = 200ms 간격)
-    HAL_Delay(50);
+    // 추가 대기 시간 (LoRa_Send의 150ms + 10ms)
+    HAL_Delay(10);
   }
 }
 

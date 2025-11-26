@@ -7691,38 +7691,38 @@ LOAD /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.id
  .debug_line    0x0001e069     0x17c1 ./Drivers/VL53L0X/core/src/vl53l0x_api_core.o
  .debug_line    0x0001f82a      0x91b ./Drivers/VL53L0X/core/src/vl53l0x_api_strings.o
 
-.debug_str      0x00000000    0xe6dc3
- .debug_str     0x00000000    0xe6dc3 ./Core/Inc/sx1272/sx1272.o
+.debug_str      0x00000000    0xe6dc2
+ .debug_str     0x00000000    0xe6dc2 ./Core/Inc/sx1272/sx1272.o
                               0xd8893 (size before relaxing)
- .debug_str     0x000e6dc3    0xd7bbc ./Core/Inc/sx1272/sx1272mb2das-board.o
- .debug_str     0x000e6dc3    0xccfde ./Core/Inc/sx1272/timer.o
- .debug_str     0x000e6dc3    0xd0200 ./Core/Inc/sx1272/utilities.o
- .debug_str     0x000e6dc3    0xd01b3 ./Core/Src/cup_system.o
- .debug_str     0x000e6dc3    0xcc8ea ./Core/Src/hx711.o
- .debug_str     0x000e6dc3    0xde089 ./Core/Src/main.o
- .debug_str     0x000e6dc3    0xcdbd8 ./Core/Src/stm32f4xx_hal_msp.o
- .debug_str     0x000e6dc3    0xccedd ./Core/Src/stm32f4xx_it.o
- .debug_str     0x000e6dc3     0x99d9 ./Core/Src/syscalls.o
- .debug_str     0x000e6dc3     0x7777 ./Core/Src/sysmem.o
- .debug_str     0x000e6dc3    0xcc7bf ./Core/Src/system_stm32f4xx.o
- .debug_str     0x000e6dc3    0xd0259 ./Core/Src/ultra.o
- .debug_str     0x000e6dc3    0xd45ce ./Core/Src/vl53l0x_platform.o
- .debug_str     0x000e6dc3    0xd4138 ./Core/Src/vl53l0x_wrapper.o
- .debug_str     0x000e6dc3       0x79 ./Core/Startup/startup_stm32f446retx.o
- .debug_str     0x000e6dc3    0xcd384 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
- .debug_str     0x000e6dc3    0xcd0db ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
- .debug_str     0x000e6dc3    0xcc93a ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
- .debug_str     0x000e6dc3    0xcd7bd ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o
- .debug_str     0x000e6dc3    0xccbf8 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
- .debug_str     0x000e6dc3    0xccc2b ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
- .debug_str     0x000e6dc3    0xcd058 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.o
- .debug_str     0x000e6dc3    0xcdb24 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
- .debug_str     0x000e6dc3    0xcd330 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
- .debug_str     0x000e6dc3    0xcd1af ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_str     0x000e6dc3     0xd69b ./Drivers/VL53L0X/core/src/vl53l0x_api.o
- .debug_str     0x000e6dc3     0xc749 ./Drivers/VL53L0X/core/src/vl53l0x_api_calibration.o
- .debug_str     0x000e6dc3     0xcd1b ./Drivers/VL53L0X/core/src/vl53l0x_api_core.o
- .debug_str     0x000e6dc3     0xbe91 ./Drivers/VL53L0X/core/src/vl53l0x_api_strings.o
+ .debug_str     0x000e6dc2    0xd7bbc ./Core/Inc/sx1272/sx1272mb2das-board.o
+ .debug_str     0x000e6dc2    0xccfde ./Core/Inc/sx1272/timer.o
+ .debug_str     0x000e6dc2    0xd0200 ./Core/Inc/sx1272/utilities.o
+ .debug_str     0x000e6dc2    0xd01b3 ./Core/Src/cup_system.o
+ .debug_str     0x000e6dc2    0xcc8ea ./Core/Src/hx711.o
+ .debug_str     0x000e6dc2    0xde088 ./Core/Src/main.o
+ .debug_str     0x000e6dc2    0xcdbd8 ./Core/Src/stm32f4xx_hal_msp.o
+ .debug_str     0x000e6dc2    0xccedd ./Core/Src/stm32f4xx_it.o
+ .debug_str     0x000e6dc2     0x99d9 ./Core/Src/syscalls.o
+ .debug_str     0x000e6dc2     0x7777 ./Core/Src/sysmem.o
+ .debug_str     0x000e6dc2    0xcc7bf ./Core/Src/system_stm32f4xx.o
+ .debug_str     0x000e6dc2    0xd0259 ./Core/Src/ultra.o
+ .debug_str     0x000e6dc2    0xd45ce ./Core/Src/vl53l0x_platform.o
+ .debug_str     0x000e6dc2    0xd4138 ./Core/Src/vl53l0x_wrapper.o
+ .debug_str     0x000e6dc2       0x79 ./Core/Startup/startup_stm32f446retx.o
+ .debug_str     0x000e6dc2    0xcd384 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+ .debug_str     0x000e6dc2    0xcd0db ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+ .debug_str     0x000e6dc2    0xcc93a ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+ .debug_str     0x000e6dc2    0xcd7bd ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o
+ .debug_str     0x000e6dc2    0xccbf8 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+ .debug_str     0x000e6dc2    0xccc2b ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o
+ .debug_str     0x000e6dc2    0xcd058 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.o
+ .debug_str     0x000e6dc2    0xcdb24 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.o
+ .debug_str     0x000e6dc2    0xcd330 ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o
+ .debug_str     0x000e6dc2    0xcd1af ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
+ .debug_str     0x000e6dc2     0xd69b ./Drivers/VL53L0X/core/src/vl53l0x_api.o
+ .debug_str     0x000e6dc2     0xc749 ./Drivers/VL53L0X/core/src/vl53l0x_api_calibration.o
+ .debug_str     0x000e6dc2     0xcd1b ./Drivers/VL53L0X/core/src/vl53l0x_api_core.o
+ .debug_str     0x000e6dc2     0xbe91 ./Drivers/VL53L0X/core/src/vl53l0x_api_strings.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Core/Inc/sx1272/sx1272.o

@@ -39,13 +39,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   00020145  00000000  00000000  0006353a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000e6dc3  00000000  00000000  0008367f  2**0
+ 18 .debug_str    000e6dc2  00000000  00000000  0008367f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0016a442  2**0
+ 19 .comment      00000043  00000000  00000000  0016a441  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000868c  00000000  00000000  0016a488  2**2
+ 20 .debug_frame  0000868c  00000000  00000000  0016a484  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000005d  00000000  00000000  00172b14  2**0
+ 21 .debug_line_str 0000005d  00000000  00000000  00172b10  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -8520,8 +8520,8 @@ void SendLaserDataToServer(void)
  8003f48:	b580      	push	{r7, lr}
  8003f4a:	b086      	sub	sp, #24
  8003f4c:	af02      	add	r7, sp, #8
-  // Chunk size 축소: 10 samples * ~4 chars + overhead < 80 bytes
-  #define CHUNK_SIZE 10
+  // Chunk size 축소: 5 samples -> 약 50 bytes 패킷
+  #define CHUNK_SIZE 5
 
   for (int start_idx = 0; start_idx < SAMPLES_PER_EVENT; start_idx += CHUNK_SIZE)
  8003f4e:	2300      	movs	r3, #0
@@ -8591,7 +8591,7 @@ void SendLaserDataToServer(void)
       // Add comma if not the last item in this chunk and not the last item overall
       if (i < CHUNK_SIZE - 1 && current_idx < SAMPLES_PER_EVENT - 1)
  8003fb0:	687b      	ldr	r3, [r7, #4]
- 8003fb2:	2b08      	cmp	r3, #8
+ 8003fb2:	2b03      	cmp	r3, #3
  8003fb4:	dc10      	bgt.n	8003fd8 <SendLaserDataToServer+0x90>
  8003fb6:	683b      	ldr	r3, [r7, #0]
  8003fb8:	2bf8      	cmp	r3, #248	@ 0xf8
@@ -8615,7 +8615,7 @@ void SendLaserDataToServer(void)
  8003fda:	3301      	adds	r3, #1
  8003fdc:	607b      	str	r3, [r7, #4]
  8003fde:	687b      	ldr	r3, [r7, #4]
- 8003fe0:	2b09      	cmp	r3, #9
+ 8003fe0:	2b04      	cmp	r3, #4
  8003fe2:	ddcc      	ble.n	8003f7e <SendLaserDataToServer+0x36>
  8003fe4:	e000      	b.n	8003fe8 <SendLaserDataToServer+0xa0>
       if (current_idx >= SAMPLES_PER_EVENT) break;
@@ -8643,13 +8643,13 @@ void SendLaserDataToServer(void)
  8004004:	4808      	ldr	r0, [pc, #32]	@ (8004028 <SendLaserDataToServer+0xe0>)
  8004006:	f7ff fe9f 	bl	8003d48 <LoRa_Send>
     
-    // 추가 대기 시간 (LoRa_Send의 150ms + 50ms = 200ms 간격)
-    HAL_Delay(50);
- 800400a:	2032      	movs	r0, #50	@ 0x32
+    // 추가 대기 시간 (LoRa_Send의 150ms + 10ms)
+    HAL_Delay(10);
+ 800400a:	200a      	movs	r0, #10
  800400c:	f001 f93a 	bl	8005284 <HAL_Delay>
   for (int start_idx = 0; start_idx < SAMPLES_PER_EVENT; start_idx += CHUNK_SIZE)
  8004010:	68fb      	ldr	r3, [r7, #12]
- 8004012:	330a      	adds	r3, #10
+ 8004012:	3305      	adds	r3, #5
  8004014:	60fb      	str	r3, [r7, #12]
  8004016:	68fb      	ldr	r3, [r7, #12]
  8004018:	2bf9      	cmp	r3, #249	@ 0xf9
